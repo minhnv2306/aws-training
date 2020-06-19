@@ -16,15 +16,15 @@ class ImageController extends Controller
     public function upload(Request $request)
     {
         $originalImage = $request->file('image');
-        $imageName = 'images/' . now()->timestamp . $originalImage->getClientOriginalName();
-
-        $img = Image::make($originalImage)
-            ->resize(220, 200);
 
         # Visiable public file: https://laravel.com/docs/7.x/filesystem#file-visibility
-        Storage::put($imageName, $img->stream()->__toString(), 'public');
+        Storage::put(
+            $this->makeFileName($originalImage),
+            $this->editImage($originalImage)->stream()->__toString(),
+            'public'
+        );
 
-        return redirect()->back()->with('status', 'Upload the file successfully!');
+        return redirect()->route('file.index')->with('status', 'Upload the file successfully!');
     }
 
     public function index()
@@ -34,5 +34,16 @@ class ImageController extends Controller
         return view('images.index', [
             'files' => $files
         ]);
+    }
+
+    private function makeFileName($originalFile)
+    {
+        return 'images/' . now()->timestamp . $originalFile->getClientOriginalName();
+    }
+
+    private function editImage($originalImage)
+    {
+        return Image::make($originalImage)
+            ->resize(220, 200);
     }
 }

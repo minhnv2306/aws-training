@@ -17,6 +17,11 @@
                         <img src="{{ Storage::url($file) }}" class="img-thumbnail" alt="Cinque Terre" width="220" height="200">
                     @endforeach
                 </div>
+                <div class="card-footer">
+                    <div class="form-group">
+                        <a class="btn btn-primary" href="/upload-file"> Upload new image </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

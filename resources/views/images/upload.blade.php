@@ -20,8 +20,11 @@
                             <label for="image">Upload File:</label>
                             <input type="file" class="form-control" id="image" name="image">
                         </div>
+                    </div>
+                    <div class="card-footer">
                         <div class="form-group">
                             <button class="btn btn-primary"> Upload </button>
+                            <a class="btn btn-secondary" href="/files">Cancel</a>
                         </div>
                     </div>
                 </form>
