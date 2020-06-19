@@ -10,7 +10,7 @@ class ImageController extends Controller
 {
     public function showUploadForm()
     {
-    	return view('images.upload');
+        return view('images.upload');
     }
 
     public function upload(Request $request)
@@ -32,7 +32,7 @@ class ImageController extends Controller
         $files = Storage::files('images');
 
         return view('images.index', [
-            'files' => $files
+            'files' => $files,
         ]);
     }
 
