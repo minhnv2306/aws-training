@@ -11,13 +11,19 @@
 |
 */
 
+/*
+* You can't cache routes if you are using a closure
+* https://laracasts.com/discuss/channels/laravel/error-unable-to-prepare-route-apiuser-for-serialization-uses-closure
+*/
+/*
 Route::get('/', function () {
     return view('welcome');
 });
-
+*/
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/','HomeController@welcome')->name('welcome');
+Route::get('/home', 'HomeController@index')->name('home')->middleware('auth');
 
 Route::get('/upload-file', 'ImageController@showUploadForm');
 Route::post('/upload-file', 'ImageController@upload')->name('file.upload');

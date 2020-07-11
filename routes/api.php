@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 |
 */
 
+/*
+* You can't cache routes if you are using a closure
+* https://laracasts.com/discuss/channels/laravel/error-unable-to-prepare-route-apiuser-for-serialization-uses-closure
+*/
+/*
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+*/
