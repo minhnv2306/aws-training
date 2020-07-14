@@ -6,3 +6,18 @@ jobs:
     steps:
       - checkout
       - run: echo "A first hello"
+  deploy_development:
+    docker:
+      - image: framgiaciteam/deb-deploy:7.3
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "59:43:6e:72:dc:75:53:ab:f3:e7:33:2a:05:98:46:a0"
+      - checkout
+      - run:
+          name: Deploy the project
+          command: |
+            if [ -z `ssh-keygen -F '52.15.170.75'` ]; then
+              ssh-keyscan -H '52.15.170.75' >> ~/.ssh/known_hosts
+            fi
+            dep deploy -vv
