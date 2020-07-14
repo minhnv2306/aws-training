@@ -31,3 +31,6 @@ jobs:
       run: |
         echo Add other actions to build,
         echo test, and deploy your project.
+    - name: Run ssh commands
+      run: |
+        ssh -a ubuntu@ec2-52-15-170-75.us-east-2.compute.amazonaws.com
