@@ -23,7 +23,7 @@ add('shared_files', [
 // Hosts
 
 host('52.15.170.75')
-	->user('ubuntu')
+    ->user('ubuntu')
     ->set('deploy_path', '/var/www/html/aws-training');    
     
 // Tasks
