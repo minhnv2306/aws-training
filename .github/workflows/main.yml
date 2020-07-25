@@ -32,15 +32,14 @@ jobs:
         echo Add other actions to build,
         echo test, and deploy your project.
 
-    - name: Hello world action step
-      id: hello
-      uses: ./
+    # Ref: https://atymic.dev/blog/github-actions-laravel-ci-cd/
+    # Setup Deployer
+    - name: Setup Deployer
+      uses: atymic/deployer-php-action@master
       with:
-        who-to-greet: 'Mona the Octocat'
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
         ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
 
-    # Use the output from the `hello` step
-    - name: Get the output time
-      run: |
-        ls -la
+    # Deploy our project
+    - name: Deploy to Prod
+      run: dep deploy -vvv

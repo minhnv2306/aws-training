@@ -10,7 +10,8 @@ set('application', 'my_project');
 set('repository', 'git@github.com:minhnv2306/aws-training.git');
 
 // [Optional] Allocate tty for git clone. Default value is false.
-set('git_tty', true); 
+// Fix issue for github action: https://github.com/deployphp/deployer/issues/1713
+set('git_tty', false); 
 
 // Default branch
 set('branch', 'master');
