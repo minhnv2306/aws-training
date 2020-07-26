@@ -17,3 +17,5 @@ public/mix-manifest.json
 
 // ignore php-cs-fixer
 .php_cs.cache
+
+.rocketeer/logs

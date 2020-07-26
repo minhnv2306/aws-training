@@ -67,6 +67,8 @@ jobs:
             if [ -z `ssh-keygen -F '52.15.170.75'` ]; then
               ssh-keyscan -H '52.15.170.75' >> ~/.ssh/known_hosts
             fi
+
+            dep deploy
 workflows:
   version: 2
   build_and_deploy:
