@@ -46,6 +46,11 @@ return [
             'agent'     => '',
             'db_role'   => true,
         ],
+        'staging' => [
+            'host'      => '52.15.170.75',
+            'username'  => 'ubuntu',
+            'key'       => '~/.ssh/id_rsa_59436e72dc7553abf3e7332a059846a0',
+        ],
     ],
 
     /*
