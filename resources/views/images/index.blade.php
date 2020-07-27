@@ -5,7 +5,10 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Demo Images From S3. Auto deployment with Circle CI</div>
+                <div class="card-header">
+                    Demo Images From S3. Auto deployment with Circle CI
+                    <p> This is my test: Deploy rockeeter! </p>
+                </div>
 
                 @if (session('status'))
                     <div class="alert alert-success" role="alert">

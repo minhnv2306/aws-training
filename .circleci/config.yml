@@ -1,12 +1,5 @@
 version: 2
 jobs:
-  hello_world:
-    docker:
-      - image: circleci/ruby:2.4.1
-    steps:
-      - checkout
-      - run: echo "A first hello"
-
   build_and_test:
     docker:
       # Specify the version you desire here
@@ -95,7 +88,6 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - hello_world
       - build_and_test
       - deployment:
           requires:

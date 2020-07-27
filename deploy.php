@@ -11,7 +11,7 @@ set('repository', 'git@github.com:minhnv2306/aws-training.git');
 
 // [Optional] Allocate tty for git clone. Default value is false.
 // Fix issue for github action: https://github.com/deployphp/deployer/issues/1713
-set('git_tty', false); 
+set('git_tty', false);
 
 // Default branch
 set('branch', 'master');
@@ -25,8 +25,7 @@ add('shared_files', [
 
 host('52.15.170.75')
     ->user('ubuntu')
-    ->set('deploy_path', '/var/www/html/aws-training');    
-    
+    ->set('deploy_path', '/var/www/html/aws-training');
 // Tasks
 
 // task('build', function () {
