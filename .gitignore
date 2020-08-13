@@ -19,3 +19,5 @@ public/mix-manifest.json
 .php_cs.cache
 
 .rocketeer/logs
+docker-compose/nginx/log
+docker-composer/.env

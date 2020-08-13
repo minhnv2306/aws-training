@@ -40,6 +40,25 @@ jobs:
       # Run tests!
       - run: sudo ~/.composer/vendor/bin/phpcs
 
+      # Docker build and push
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Setup VirtualEnv
+          command: |
+            echo 'export TAG=0.1.${CIRCLE_BUILD_NUM}' >> $BASH_ENV
+            echo 'export IMAGE_NGINX_NAME=m_nginx' >> $BASH_ENV
+            echo 'export IMAGE_PHP_NAME=m_php_fpm' >> $BASH_ENV
+      - run:
+          name: Build and push Docker image
+          command: |
+            docker build -t minhnv2306/$IMAGE_NGINX_NAME:$TAG ./docker-compose/nginx
+            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
+            docker push minhnv2306/$IMAGE_NGINX_NAME:$TAG
+
+            docker build -t minhnv2306/$IMAGE_PHP_NAME:$TAG ./docker-compose/nginx
+            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
+            docker push minhnv2306/$IMAGE_PHP_NAME:$TAG
   # deployment:
   #   docker:
   #     - image: circleci/php:7.2-browsers
@@ -84,12 +103,29 @@ jobs:
             fi
 
             rocketeer deploy --on=staging --no-interaction
+  docker-deployment:
+    docker:
+      - image: ubuntu:18.04
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "59:43:6e:72:dc:75:53:ab:f3:e7:33:2a:05:98:46:a0"
+      - run:
+          name: Deploy app to My Project Server via Docker
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@52.15.170.75 "cd /var/www/html/docker-deploy && /bin/bash ./docker-compose/deploy-app.sh $TAG"
 workflows:
   version: 2
   build_and_deploy:
     jobs:
       - build_and_test
       - deployment:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: master
+      - docker-deployment:
           requires:
             - build_and_test
           filters:

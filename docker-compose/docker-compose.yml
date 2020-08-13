@@ -1,0 +1,33 @@
+# Sử dụng version 3.3 cho nó mới
+version: "3.3"
+
+services:
+  nginx:
+    image: minhnv2306/m_nginx:$NGINX_TAG
+    ports:
+      - "8080:80"
+    # Thêm depends_on để nó start php-fpm trước khi start nginx, nếu không sẽ bị báo lỗi host php-fpm không tìm thấy
+    depends_on:
+      - php-fpm
+    volumes:
+      # Logging
+      - ./nginx/log:/var/log/nginx/
+      # Volume đến code ứng dụng
+      - ../:/var/www/html/
+  php-fpm:
+    image: minhnv2306/m_php_fpm:$PHP_FPM_TAG
+    volumes:
+      - ../:/var/www/html/
+    expose:
+      - "9000"
+
+  # Workspace　được cài đặt đầy đủ các thứ (npm, composer, ruby, phpcs) giúp bạn làm việc với code, cài đặt các dependency
+  # Warining: Chính vì cài đầy đủ các tool nên nó khá nặng, cân nhắc sử dụng nó. Thay vì đó bạn nên cài đặt các tool này vào
+  # các service ở trên, như cài composer vào php-fpm chẳng hạn :D
+  # Ref: https://hub.docker.com/r/framgia/laravel-workspace
+  workspace:
+    image: framgia/laravel-workspace
+    working_dir: /var/www/html
+    volumes:
+      - ../:/var/www/html/
+    tty: true
