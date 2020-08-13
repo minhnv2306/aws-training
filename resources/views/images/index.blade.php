@@ -8,6 +8,7 @@
                 <div class="card-header">
                     Demo Images From S3. Auto deployment with Circle CI
                     <p> This is my test: Deploy rockeeter! </p>
+                    <p> This is my test: Deploy with docker! </p>
                 </div>
 
                 @if (session('status'))

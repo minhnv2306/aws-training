@@ -105,7 +105,7 @@ jobs:
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
             docker push minhnv2306/$IMAGE_NGINX_NAME:$TAG
 
-            docker build -t minhnv2306/$IMAGE_PHP_NAME:$TAG ./docker-compose/nginx
+            docker build -t minhnv2306/$IMAGE_PHP_NAME:$TAG ./docker-compose/php-fpm
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
             docker push minhnv2306/$IMAGE_PHP_NAME:$TAG
       - add_ssh_keys:
@@ -128,7 +128,7 @@ workflows:
               only: master
       - docker-deployment:
           requires:
-            - build_and_test
+            - deployment
           filters:
             branches:
               only: master
