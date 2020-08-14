@@ -3,7 +3,7 @@ jobs:
   build_and_test:
     docker:
       # Specify the version you desire here
-      - image: circleci/php:7.4-node-browsers
+      - image: circleci/php:7.2-browsers
 
     steps:
       - checkout
@@ -34,11 +34,40 @@ jobs:
 
       # Run tests with phpunit
       - run:
-          name: "Run Tests"
+          name: "Run PHPUnit Tests"
           command: ./vendor/bin/phpunit
 
-      # Run tests!
-      - run: sudo ~/.composer/vendor/bin/phpcs
+      # Run phpcs tests!
+      - run:
+          name: "Run PHPCS Tests"
+          command: sudo ~/.composer/vendor/bin/phpcs
+
+      # Sending Chatwork Notification
+      - run:
+          name: "Sending Chatwork Notification"
+          when: on_success
+          command: |
+            if [[ true ]];  then
+              curl -X POST -H "X-ChatWorkToken: $CHATWORK_TOKEN" -d \
+                "body=[To:3008547] [info][title]Circle CI Build Result $CIRCLE_BUILD_NUM - SUCCESS[/title]Repo: $CIRCLE_PROJECT_REPONAME
+            Author: $CIRCLE_USERNAME
+            Branch: $CIRCLE_BRANCH
+            Build link: https://app.circleci.com/pipelines/github/minhnv2306/aws-training/$CIRCLE_BUILD_NUM [/info]" \
+            "https://api.chatwork.com/v2/rooms/$CHATWORK_ROOM_ID/messages"
+            fi
+      # Sending Chatwork Notification
+      - run:
+          name: "Sending Chatwork Notification"
+          when: on_fail
+          command: |
+            if [[ true ]];  then
+              curl -X POST -H "X-ChatWorkToken: $CHATWORK_TOKEN" -d \
+                "body=[To:3008547] [info][title]Circle CI Build Result $CIRCLE_BUILD_NUM - FAIL[/title]Repo: $CIRCLE_PROJECT_REPONAME
+            Author: $CIRCLE_USERNAME
+            Branch: $CIRCLE_BRANCH
+            Build link: https://app.circleci.com/pipelines/github/minhnv2306/aws-training/$CIRCLE_BUILD_NUM [/info]" \
+            "https://api.chatwork.com/v2/rooms/$CHATWORK_ROOM_ID/messages"
+            fi
 
   # deployment:
   #   docker:
