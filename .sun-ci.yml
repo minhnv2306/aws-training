@@ -1,0 +1,100 @@
+workspace: true
+
+stages:
+  - build
+  - test
+  - deploy
+
+jobs:
+- name: build:laravel
+  stage: build
+  image: sunasteriskrnd/php-workspace:7.4
+  environment:
+    APP_ENV: testing
+  cache:
+  - key: comopser_vendor_$CI_BRANCH
+    paths:
+      - vendor
+  before_script:
+  - cp .env.example .env.testing
+  - composer install
+  - php artisan key:generate
+  - composer global require "squizlabs/php_codesniffer=*"
+  - git clone https://github.com/wataridori/framgia-php-codesniffer.git ~/.composer/vendor/squizlabs/php_codesniffer/src/Standards/Framgia
+  # - php artisan migrate
+  script:
+  - composer sniff
+  - composer test
+  after_script:
+  - echo "Finish job"
+  only:
+    branches:
+    - master
+    events:
+    - pull_request
+  except:
+    branches:
+    - develop
+    events:
+    - push
+  artifacts:
+    paths:
+    - app/
+    expires_in: 3 days
+
+- name: build:js
+  stage: build
+  image: node:10
+  cache:
+    - key: node_modules_$CI_BRANCH
+      paths:
+        - node_modules
+  script:
+    - npm install
+    - npm run dev
+  after_script:
+    - echo "Build assets done."
+  only:
+    branches:
+      - master
+    events:
+      - pull_request
+
+- name: test:node
+  stage: test
+  image: node:12-alpine
+  script:
+  - yarn
+  - yarn lint
+  only:
+    branches:
+      - master
+    events:
+      - pull_request
+
+- name: deploy:production
+  stage: deploy
+  image: sunasteriskrnd/php-workspace:7.4
+  before_script:
+  - curl -LO https://deployer.org/deployer.phar
+  - mv deployer.phar /usr/local/bin/dep
+  - chmod +x /usr/local/bin/dep
+  - apk add openssh
+  - mkdir /root/.ssh
+  - echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
+  - chmod 700 -R /root/.ssh
+  - chmod 600 -R /root/.ssh/*
+  - echo "Host *\n\tStrictHostKeyChecking no\n\tIdentityFile /root/.ssh/id_rsa\n\tAddKeysToAgent yes\n" >> /root/.ssh/config
+  - ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
+  script:
+  - dep deploy -vv
+  only:
+    branches:
+    - master
+    events:
+    - push
+  except:
+    branches:
+    - master
+    events:
+    - pull_request

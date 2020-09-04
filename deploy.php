@@ -7,7 +7,7 @@ require 'recipe/laravel.php';
 set('application', 'my_project');
 
 // Project repository
-set('repository', 'git@github.com:minhnv2306/aws-training.git');
+set('repository', 'https://github.com/minhnv2306/aws-training.git');
 
 // [Optional] Allocate tty for git clone. Default value is false.
 // Fix issue for github action: https://github.com/deployphp/deployer/issues/1713
@@ -23,7 +23,7 @@ add('shared_files', [
 
 // Hosts
 
-host('52.15.170.75')
+host('18.222.48.70')
     ->user('ubuntu')
     ->set('deploy_path', '/var/www/html/aws-training');
 // Tasks
