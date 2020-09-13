@@ -93,8 +93,3 @@ jobs:
     - master
     events:
     - push
-  except:
-    branches:
-    - master
-    events:
-    - pull_request

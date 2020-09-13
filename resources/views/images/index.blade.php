@@ -9,6 +9,7 @@
                     Demo Images From S3. Auto deployment with Circle CI
                     <p> This is my test: Deploy rockeeter! </p>
                     <p> This is my test: Deploy with docker! </p>
+                    <p> This is my test: Autodeploy with Sun CI ^^ </p>
                 </div>
 
                 @if (session('status'))
