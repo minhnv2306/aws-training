@@ -61,6 +61,8 @@
             "@php artisan key:generate --ansi"
         ],
         "lint": "php-cs-fixer fix --diff --dry-run",
-        "fix": "php-cs-fixer fix"
+        "fix": "php-cs-fixer fix",
+        "sniff": "~/.composer/vendor/bin/phpcs",
+        "test": "./vendor/bin/phpunit"
     }
 }

@@ -145,15 +145,15 @@ workflows:
   build_and_deploy:
     jobs:
       - build_and_test
-      - deployment:
-          requires:
-            - build_and_test
-          filters:
-            branches:
-              only: master
-      - docker-deployment:
-          requires:
-            - deployment
-          filters:
-            branches:
-              only: master
+      # - deployment:
+      #     requires:
+      #       - build_and_test
+      #     filters:
+      #       branches:
+      #         only: master
+      # - docker-deployment:
+      #     requires:
+      #       - deployment
+      #     filters:
+      #       branches:
+      #         only: master
