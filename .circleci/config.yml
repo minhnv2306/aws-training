@@ -112,11 +112,11 @@ jobs:
             docker push minhnv2306/$IMAGE_PHP_NAME:$TAG
       - add_ssh_keys:
           fingerprints:
-            - "59:43:6e:72:dc:75:53:ab:f3:e7:33:2a:05:98:46:a0"
+            - "de:4b:4c:0c:ad:b8:e0:a3:29:85:4d:63:34:43:39:0e"
       - run:
           name: Deploy app to My Project Server via Docker
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@52.15.170.75 "cd /var/www/html/docker-deploy && git pull origin master && /bin/bash ./docker-compose/deploy-app.sh ${TAG}"
+            ssh -o StrictHostKeyChecking=no ubuntu@18.222.48.70 "cd /var/www/html/docker-deploy && git pull origin master && /bin/bash ./docker-compose/deploy-app.sh ${TAG}"
 
       # Sending Chatwork successful notification
       - run:
@@ -145,6 +145,7 @@ workflows:
   build_and_deploy:
     jobs:
       - build_and_test
+      - docker-deployment
       # - deployment:
       #     requires:
       #       - build_and_test
