@@ -23,7 +23,7 @@
     <exclude-pattern>*/tests/Core/*/*Test\.(inc|css|js)$</exclude-pattern>
 
     <!-- Bước 5: Dùng rule nào để kiểm tra convention, nó sẽ có các chuẩn PEAR, PSR1, PSR2, Framgia -->
-    <rule ref="Framgia"/>
+    <rule ref="PSR2"/>
 
     <!-- Bước 6: Tùy chọn, có thể có hoặc không?
          Đoạn sau này sẽ là custom lại các biến nhé.

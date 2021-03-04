@@ -13,8 +13,6 @@ jobs:
           command: |
             sudo apt update
             sudo docker-php-ext-install zip
-            composer global require "squizlabs/php_codesniffer=*"
-            git clone https://github.com/wataridori/framgia-php-codesniffer.git ~/.composer/vendor/squizlabs/php_codesniffer/src/Standards/Framgia
 
       # Download and cache dependencies
       - restore_cache:
@@ -40,9 +38,7 @@ jobs:
       # Run phpcs tests!
       - run:
           name: "Run PHPCS Tests"
-          # Need to fix it
-          # command: sudo ~/.composer/vendor/bin/phpcs
-          command: echo 1
+          command: ./vendor/bin/phpcs -np
 
   # deployment:
   #   docker:
