@@ -7,7 +7,7 @@ return [
     // The name of the application to deploy
     // This will create a folder of the same name in the root directory
     // configured above, so be careful about the characters used
-    'application_name' => 'demo82',
+    'application_name' => 'aws-training',
 
     // Plugins
     ////////////////////////////////////////////////////////////////////
@@ -47,9 +47,9 @@ return [
             'db_role'   => true,
         ],
         'staging' => [
-            'host'      => '52.15.170.75',
-            'username'  => 'ubuntu',
-            'key'       => '~/.ssh/id_rsa_59436e72dc7553abf3e7332a059846a0',
+            'host'      => '3.142.12.48',
+            'username'  => 'ec2-user',
+            'key'       => '~/.ssh/id_rsa_fae7bc31f99c34d95fe45f4216622021',
         ],
     ],
 
