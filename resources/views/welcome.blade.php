@@ -81,7 +81,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel deploy with rocketeer
+                    Laravel deploy with deployer
                 </div>
 
                 <div class="links">
