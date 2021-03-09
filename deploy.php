@@ -14,7 +14,7 @@ set('repository', 'https://github.com/minhnv2306/aws-training.git');
 set('git_tty', false);
 
 // Default branch
-set('branch', 'master');
+set('branch', 'FIX-change-host-docker');
 
 // Shared files/dirs between deploys
 add('shared_files', [
@@ -23,9 +23,9 @@ add('shared_files', [
 
 // Hosts
 
-host('18.222.48.70')
-    ->user('ubuntu')
-    ->set('deploy_path', '/var/www/html/aws-training');
+host('3.142.12.48')
+    ->user('ec2-user')
+    ->set('deploy_path', '/var/www/html/demo81');
 // Tasks
 
 // task('build', function () {
@@ -36,4 +36,4 @@ host('18.222.48.70')
 after('deploy:failed', 'deploy:unlock');
 
 // Migrate database before symlink new release.
-before('deploy:symlink', 'artisan:migrate');
+// before('deploy:symlink', 'artisan:migrate');

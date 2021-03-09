@@ -3,7 +3,7 @@ jobs:
   build_and_test:
     docker:
       # Specify the version you desire here
-      - image: circleci/php:7.2-browsers
+      - image: php:7.4.16-cli-alpine
 
     steps:
       - checkout
@@ -11,10 +11,10 @@ jobs:
       - run:
           name: "Prepare Environment"
           command: |
-            sudo apt update
-            sudo docker-php-ext-install zip
-            composer global require "squizlabs/php_codesniffer=*"
-            git clone https://github.com/wataridori/framgia-php-codesniffer.git ~/.composer/vendor/squizlabs/php_codesniffer/src/Standards/Framgia
+            # sudo apt-get update
+            curl -sS https://getcomposer.org/installer -o composer-setup.php
+            php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+            # sudo docker-php-ext-install zip
 
       # Download and cache dependencies
       - restore_cache:
@@ -40,55 +40,83 @@ jobs:
       # Run phpcs tests!
       - run:
           name: "Run PHPCS Tests"
-          command: sudo ~/.composer/vendor/bin/phpcs
+          command: ./vendor/bin/phpcs -np
 
+  deployment:
+    docker:
+      - image: php:7.3-cli-buster
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "$PRIVATE_KEY_FINGERPRINTS"
+      - checkout
+      - run:
+          name: "Prepare Environment"
+          command: |
+            # We can move it in custom image
+            apt-get update
+            apt-get install openssh-client -y
+      - run:
+          name: Install Deployer
+          command: |
+            curl -LO https://deployer.org/deployer.phar
+            mv deployer.phar /usr/local/bin/dep
+            chmod +x /usr/local/bin/dep
+      - run:
+          name: Deploy
+          command: |
+            if [ -z `ssh-keygen -F $HOST` ]; then
+              ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+            fi
+
+            dep deploy
+      # Sending Chatwork successful notification
+      - run:
+          name: "Sending Chatwork successful notification"
+          when: on_success
+          command: |
+            curl -X POST -H "X-ChatWorkToken: $CHATWORK_TOKEN" -d \
+              "body=$LIST_TO_CHATWORK [info][title]Circle CI Build Result $CIRCLE_BUILD_NUM - SUCCESS[/title]Repo: $CIRCLE_PROJECT_REPONAME
+            Author: $CIRCLE_USERNAME
+            Branch: $CIRCLE_BRANCH
+            Build link: https://app.circleci.com/pipelines/github/minhnv2306/aws-training/$CIRCLE_BUILD_NUM [/info]" \
+            "https://api.chatwork.com/v2/rooms/$CHATWORK_ROOM_ID/messages"
+      # Sending Chatwork failed notification
+      - run:
+          name: "Sending Chatwork failed notification"
+          when: on_fail
+          command: |
+            curl -X POST -H "X-ChatWorkToken: $CHATWORK_TOKEN" -d \
+              "body=$LIST_TO_CHATWORK [info][title]Circle CI Build Result $CIRCLE_BUILD_NUM - FAIL[/title]Repo: $CIRCLE_PROJECT_REPONAME
+            Author: $CIRCLE_USERNAME
+            Branch: $CIRCLE_BRANCH
+            Build link: https://app.circleci.com/pipelines/github/minhnv2306/aws-training/$CIRCLE_BUILD_NUM [/info]" \
+            "https://api.chatwork.com/v2/rooms/$CHATWORK_ROOM_ID/messages"
   # deployment:
   #   docker:
   #     - image: circleci/php:7.2-browsers
   #   steps:
   #     - add_ssh_keys:
   #         fingerprints:
-  #           - "59:43:6e:72:dc:75:53:ab:f3:e7:33:2a:05:98:46:a0"
+  #           - "$PRIVATE_KEY_FINGERPRINTS"
   #     - checkout
   #     - run:
-  #         name: Install Deployer
+  #         name: Install Rocketeer
   #         command: |
-  #           curl -LO https://deployer.org/deployer.phar
-  #           sudo mv deployer.phar /usr/local/bin/dep
-  #           sudo chmod +x /usr/local/bin/dep
+  #           wget http://rocketeer.autopergamene.eu/versions/rocketeer.phar
+  #           sudo chmod +x rocketeer.phar
+  #           sudo mv rocketeer.phar /usr/local/bin/rocketeer
   #     - run:
   #         name: Deploy
   #         command: |
-  #           if [ -z `ssh-keygen -F '52.15.170.75'` ]; then
-  #             ssh-keyscan -H '52.15.170.75' >> ~/.ssh/known_hosts
+  #           if [ -z `ssh-keygen -F '3.142.12.48'` ]; then
+  #             ssh-keyscan -H '3.142.12.48' >> ~/.ssh/known_hosts
   #           fi
 
-  #           dep deploy
-  deployment:
-    docker:
-      - image: circleci/php:7.2-browsers
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "59:43:6e:72:dc:75:53:ab:f3:e7:33:2a:05:98:46:a0"
-      - checkout
-      - run:
-          name: Install Rocketeer
-          command: |
-            wget http://rocketeer.autopergamene.eu/versions/rocketeer.phar
-            sudo chmod +x rocketeer.phar
-            sudo mv rocketeer.phar /usr/local/bin/rocketeer
-      - run:
-          name: Deploy
-          command: |
-            if [ -z `ssh-keygen -F '52.15.170.75'` ]; then
-              ssh-keyscan -H '52.15.170.75' >> ~/.ssh/known_hosts
-            fi
-
-            rocketeer deploy --on=staging --no-interaction
+  #           rocketeer deploy --on=staging --no-interaction
   docker-deployment:
     docker:
-      - image: circleci/php:7.2-browsers
+      - image: circleci/php:7.3.25-cli
     steps:
       - checkout
       # Docker build and push
@@ -112,42 +140,20 @@ jobs:
             docker push minhnv2306/$IMAGE_PHP_NAME:$TAG
       - add_ssh_keys:
           fingerprints:
-            - "59:43:6e:72:dc:75:53:ab:f3:e7:33:2a:05:98:46:a0"
+            - "$PRIVATE_KEY_FINGERPRINTS"
       - run:
           name: Deploy app to My Project Server via Docker
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@52.15.170.75 "cd /var/www/html/docker-deploy && git pull origin master && /bin/bash ./docker-compose/deploy-app.sh ${TAG}"
+            ssh -o StrictHostKeyChecking=no $USER_HOST@$HOST "cd /var/www/html/docker-deploy && git pull origin master && /bin/bash ./docker-compose/deploy-app.sh ${TAG}"
 
-      # Sending Chatwork successful notification
-      - run:
-          name: "Sending Chatwork successful notification"
-          when: on_success
-          command: |
-            curl -X POST -H "X-ChatWorkToken: $CHATWORK_TOKEN" -d \
-              "body=[To:3008547] [info][title]Circle CI Build Result $CIRCLE_BUILD_NUM - SUCCESS[/title]Repo: $CIRCLE_PROJECT_REPONAME
-            Author: $CIRCLE_USERNAME
-            Branch: $CIRCLE_BRANCH
-            Build link: https://app.circleci.com/pipelines/github/minhnv2306/aws-training/$CIRCLE_BUILD_NUM [/info]" \
-            "https://api.chatwork.com/v2/rooms/$CHATWORK_ROOM_ID/messages"
-      # Sending Chatwork failed notification
-      - run:
-          name: "Sending Chatwork failed notification"
-          when: on_fail
-          command: |
-            curl -X POST -H "X-ChatWorkToken: $CHATWORK_TOKEN" -d \
-              "body=[To:3008547] [info][title]Circle CI Build Result $CIRCLE_BUILD_NUM - FAIL[/title]Repo: $CIRCLE_PROJECT_REPONAME
-            Author: $CIRCLE_USERNAME
-            Branch: $CIRCLE_BRANCH
-            Build link: https://app.circleci.com/pipelines/github/minhnv2306/aws-training/$CIRCLE_BUILD_NUM [/info]" \
-            "https://api.chatwork.com/v2/rooms/$CHATWORK_ROOM_ID/messages"
 workflows:
   version: 2
   build_and_deploy:
     jobs:
       - build_and_test
-      # - deployment:
-      #     requires:
-      #       - build_and_test
+      - deployment:
+          requires:
+            - build_and_test
       #     filters:
       #       branches:
       #         only: master
