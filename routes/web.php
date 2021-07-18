@@ -28,3 +28,7 @@ Route::get('/home', 'HomeController@index')->name('home')->middleware('auth');
 Route::get('/upload-file', 'ImageController@showUploadForm');
 Route::post('/upload-file', 'ImageController@upload')->name('file.upload');
 Route::get('/files', 'ImageController@index')->name('file.index');
+
+Route::get('error', function() {
+    throw new \Exception('This is error, created by me!');
+});
